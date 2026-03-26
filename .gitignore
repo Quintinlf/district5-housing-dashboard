@@ -1,0 +1,5 @@
+# Phase 1 raw feed downloads (reproducible, large binaries)
+data/raw/*.zip
+
+# Notebook autosave artifacts
+.ipynb_checkpoints/

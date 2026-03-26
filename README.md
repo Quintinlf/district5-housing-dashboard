@@ -127,3 +127,65 @@ The shaded bands in Figures 3 and 4 represent **±1σ and ±2σ posterior uncert
 ---
 
 *Data: U.S. Census Bureau ACS 5-Year Estimates, Tables B25031 & B19013. Analysis performed in Python using open-source libraries. All code is reproducible and auditable.*
+
+---
+
+## SB 79 TOD Implementation (Phase 1)
+
+Phase 1 is now implemented in [sb79_phase1_pipeline.py](sb79_phase1_pipeline.py). It bootstraps the TOD workflow by:
+
+1. Downloading current LA Metro **bus + rail** GTFS schedule feeds
+2. Computing stop-level weekday service intensity by mode
+3. Assigning **preliminary** SB 79 tier labels using transparent thresholds
+4. Exporting clean CSVs for downstream parcel/zoning joins
+
+### Run Phase 1
+
+```bash
+pip install pandas requests
+```
+
+```bash
+python sb79_phase1_pipeline.py
+```
+
+Optional threshold tuning:
+
+```bash
+python sb79_phase1_pipeline.py --tier1-trips 72 --tier2-trips 48
+```
+
+If your environment blocks certificate validation on external downloads:
+
+```bash
+python sb79_phase1_pipeline.py --allow-insecure-download
+```
+
+### Outputs
+
+- `data/raw/la_metro_gtfs.zip`
+- `data/raw/la_metro_gtfs_bus.zip`
+- `data/raw/la_metro_gtfs_rail.zip`
+- `data/interim/sb79_stop_service_summary.csv`
+- `data/interim/sb79_tier_counts.csv`
+
+### Important Note
+
+The generated tier labels are implementation heuristics for analysis prototyping. Before publication, validate final stop eligibility and tier assignment against official SB 79 implementation maps and agency guidance (SCAG, LA City Planning, and HCD).
+
+### Standalone Integrated Notebook
+
+A separate notebook now exists for SB 79 + housing integration:
+
+- `sb79_tod_housing_analysis.ipynb`
+
+It reuses District 5 housing data logic through:
+
+- `housing_tod_utils.py`
+
+Run it directly in VS Code/Jupyter. It will:
+
+1. Reuse or regenerate GTFS tier outputs
+2. Build a District 5 transit proxy from ZIP centroids
+3. Pull ACS housing data for District 5 ZIPs
+4. Produce integrated policy metrics and charts
